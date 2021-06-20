@@ -1,4 +1,5 @@
 ﻿using OdeToFood.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,7 +7,8 @@ namespace OdeToFoodData
 {
     public interface IRestaurantData
     {
-        IEnumerable<Restaurant> GetAll();
+        IEnumerable<Restaurant> GetRestaurantsByName(string name);
+        Restaurant GetById(int id);
     }
 
     public class InMemoryRestaurantData : IRestaurantData
@@ -24,13 +26,24 @@ namespace OdeToFoodData
             };
         }
 
-        public IEnumerable<Restaurant> GetAll()
+        public IEnumerable<Restaurant> GetRestaurantsByName(string name = null)
         {
-            // return from r in restaurants
-            // orderby r.Name
-            // select r;
-            List<Restaurant> newRestaurants = restaurants.OrderBy(r => r.Name).ToList();
+            var newRestaurants = from r in restaurants
+                                 select r;
+
+            if (!String.IsNullOrEmpty(name))
+            {
+                newRestaurants = restaurants.Where(s => s.Name.Contains(name));
+                return newRestaurants;
+            }
+                newRestaurants = restaurants.OrderBy(r => r.Name).ToList();
+            
             return newRestaurants;
+        }
+
+        public Restaurant GetById(int id)
+        {
+            return restaurants.FirstOrDefault(r => r.Id == id);
         }
     }
 }
